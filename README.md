@@ -2,6 +2,8 @@
 
 一个演示用的前后端分离评论系统：**后端** Go + Gin + GORM + MySQL，**前端** React + Vite + TypeScript。支持两级评论（根评论 + 回复）、分页、查看更多/加载更多、删除，可通过 Docker Compose 一键部署。
 
+![评论系统页面截图](./images/screenshot.png)
+
 ---
 
 ## 功能说明
