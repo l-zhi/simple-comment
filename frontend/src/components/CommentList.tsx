@@ -1,6 +1,5 @@
 import { Comment, RootWithPreview } from "../types/comment";
 
-const PREVIEW_SIZE = 2;
 const REPLIES_PAGE_SIZE = 20;
 
 interface Props {
@@ -97,7 +96,6 @@ export function CommentList({
         {list.map((root) => {
           const rootComment = root.comment;
           const replyCount = root.replyCount ?? 0;
-          const previewReplies = root.replies ?? [];
           const expanded = expandedReplies[rootComment.id] ?? null;
           const loadedReplies = expanded !== null ? expanded : [];
           const hasMoreReplies = replyCount > loadedReplies.length;
@@ -113,24 +111,14 @@ export function CommentList({
                 onDelete={onDelete}
               />
 
-              {/* 二级：先展示最多 2 条预览 */}
               <div className="comment-replies">
-                {!isExpanded &&
-                  previewReplies.slice(0, PREVIEW_SIZE).map((r) => (
-                    <CommentItem
-                      key={r.id}
-                      c={r}
-                      onReply={onReply}
-                      onDelete={onDelete}
-                    />
-                  ))}
-                {!isExpanded && replyCount > PREVIEW_SIZE && (
+                {!isExpanded && replyCount > 0 && (
                   <button
                     type="button"
                     className="comment-more-link"
                     onClick={() => onExpandReplies(rootComment.id)}
                   >
-                    查看更多（{replyCount - PREVIEW_SIZE} 条回复）
+                    查看全部 {replyCount} 条回复
                   </button>
                 )}
 

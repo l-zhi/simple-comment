@@ -77,7 +77,6 @@ func (s *CommentService) CreateComment(ctx context.Context, in *CreateCommentInp
 
 const (
 	RootsPageSize   = 10
-	PreviewReplies  = 2
 	RepliesPageSize = 20
 )
 
@@ -127,7 +126,7 @@ func (s *CommentService) enrichRepliesWithTarget(ctx context.Context, root *mode
 	return out
 }
 
-// ListRootsWithPreview 一级评论分页，每条约带回复总数与最多 2 条预览回复
+// ListRootsWithPreview 一级评论分页，每条约带回复总数（不再返回预览回复）
 func (s *CommentService) ListRootsWithPreview(ctx context.Context, articleID uint, page, pageSize int) ([]*model.RootWithPreview, int64, error) {
 	if pageSize <= 0 || pageSize > 50 {
 		pageSize = RootsPageSize
@@ -149,21 +148,14 @@ func (s *CommentService) ListRootsWithPreview(ctx context.Context, articleID uin
 	for _, r := range roots {
 		rootIDs = append(rootIDs, r.ID)
 	}
-	previewMap := s.repo.GetPreviewRepliesForRoots(ctx, rootIDs, PreviewReplies)
 	replyCounts := s.repo.CountRepliesByParents(ctx, rootIDs)
 
 	out := make([]*model.RootWithPreview, 0, len(roots))
 	for _, r := range roots {
-		previews := previewMap[r.ID]
-		enriched := s.enrichRepliesWithTarget(ctx, r, previews)
-		replies := make([]model.Comment, 0, len(enriched))
-		for _, p := range enriched {
-			replies = append(replies, *p)
-		}
 		out = append(out, &model.RootWithPreview{
 			Comment:    *r,
 			ReplyCount: replyCounts[r.ID],
-			Replies:    replies,
+			Replies:    []model.Comment{},
 		})
 	}
 	return out, total, nil
