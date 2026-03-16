@@ -8,11 +8,12 @@
 
 ## 功能说明
 
-- **发表评论**：填写昵称与内容即可发布根评论。
+- **帖子**：发布帖子（标题 + 正文）、帖子列表分页、删除帖子；选择某篇帖子后下方展示该帖的评论。
+- **发表评论**：在选中的帖子下填写昵称与内容即可发布根评论。
 - **回复**：可回复根评论或楼内任意一条回复；展示「回复 xxx 的评论」及被回复内容摘要。
 - **列表**：一级评论分页（每页 10 条），每条带回复总数与最多 2 条预览回复。
 - **查看更多**：点击后拉取该楼全部回复（分页，每批 20 条），支持「加载更多」。
-- **删除**：单条评论软删除；被回复评论删除后，其回复不再展示。
+- **删除**：可删除帖子或单条评论（评论软删除）；被回复评论删除后，其回复不再展示。
 
 ---
 
@@ -123,7 +124,8 @@ simple-comment/
 │   │   ├── router/          # 路由与依赖注入
 │   │   └── service/         # 业务逻辑
 │   └── migrations/
-│       └── comments.sql     # 评论表结构
+│       ├── articles.sql    # 帖子表结构
+│       └── comments.sql    # 评论表结构
 ├── frontend/                # React 前端
 │   ├── src/
 │   │   ├── api/             # 接口封装
@@ -144,7 +146,11 @@ simple-comment/
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/api/comments` | 一级评论分页，query: `articleId`, `page`, `pageSize` |
+| GET | `/api/posts` | 帖子列表分页，query: `page`, `pageSize` |
+| GET | `/api/posts/:id` | 获取单篇帖子 |
+| POST | `/api/posts` | 发布帖子，body: `title`, `content` |
+| DELETE | `/api/posts/:id` | 删除帖子 |
+| GET | `/api/comments` | 一级评论分页，query: `articleId`（帖子 id）, `page`, `pageSize` |
 | GET | `/api/comments/replies` | 某楼回复分页，query: `parentId`（根评论 id）, `offset`, `limit` |
 | POST | `/api/comments` | 发表/回复，body: `articleId`, `parentId`, `userName`, `content` 等 |
 | DELETE | `/api/comments/:id` | 软删除指定评论 |

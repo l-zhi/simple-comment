@@ -38,17 +38,22 @@ func New(cfg *config.Config) *gin.Engine {
 		panic(err)
 	}
 
-	if err := db.AutoMigrate(&model.Comment{}); err != nil {
+	if err := db.AutoMigrate(&model.Comment{}, &model.Article{}); err != nil {
 		log.Printf("[migrate] AutoMigrate: %v", err)
 		panic(err)
 	}
 
-	repo := repository.NewCommentRepository(db)
-	svc := service.NewCommentService(repo)
-	h := handler.NewCommentHandler(svc)
+	commentRepo := repository.NewCommentRepository(db)
+	commentSvc := service.NewCommentService(commentRepo)
+	commentH := handler.NewCommentHandler(commentSvc)
+
+	articleRepo := repository.NewArticleRepository(db)
+	articleSvc := service.NewArticleService(articleRepo)
+	articleH := handler.NewArticleHandler(articleSvc)
 
 	api := r.Group("/api")
-	h.RegisterRoutes(api)
+	commentH.RegisterRoutes(api)
+	articleH.RegisterRoutes(api)
 
 	return r
 }
